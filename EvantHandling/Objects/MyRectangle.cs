@@ -15,14 +15,13 @@ namespace EvantHandling.Objects
 
         public override void Render(Graphics g)
         {
-            g.FillRectangle(new SolidBrush(Color.Yellow), -25, -15, 50, 30);
-            g.DrawRectangle(new Pen(Color.Red), -25, -15, 50, 30);
+            g.FillEllipse(new SolidBrush(Color.Green), -15, -15, 30, 30);
         }
 
         public override GraphicsPath GetGraphicsPath()
         {
             var path = base.GetGraphicsPath();
-            path.AddRectangle(new RectangleF(-25, -15, 50, 30));
+            path.AddRectangle(new RectangleF(-15, -15, 30, 30));
             return path;
         }
     }

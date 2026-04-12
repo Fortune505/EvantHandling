@@ -8,28 +8,46 @@ namespace EvantHandling
         List<BaseObject> objects = new();
         Player player;
         Marker marker;
+        Random rnd = new Random();
+        int score = 0;
         public Form1()
         {
             InitializeComponent();
-            timer1.Enabled = true;
-            timer1.Interval = 20;
             timer1.Tick -= timer1_Tick;
             timer1.Tick += timer1_Tick;
             pbMain.MouseClick -= pbMain_MouseClick;
             pbMain.MouseClick += pbMain_MouseClick;
+
             player = new Player(pbMain.Width / 2, pbMain.Height / 2, 0);
             player.OnMarkerOverlap += (m) =>
             {
                 objects.Remove(m);
                 marker = null;
             };
+
             marker = new Marker(pbMain.Width / 2 + 50, pbMain.Height / 2 + 50, 0);
 
             objects.Add(marker);
             objects.Add(player);
-            objects.Add(new MyRectangle(50, 50, 0));
-            objects.Add(new MyRectangle(100, 100, 45));
 
+            for (int i = 0; i < 2; i++)
+            {
+                var greenCircle = new MyRectangle(rnd.Next(30, pbMain.Width - 30), rnd.Next(30, pbMain.Height - 30), 0);
+                greenCircle.OnOverlap += (sender, otherObj) =>
+                {
+                    if (otherObj is Player)
+                    {
+                        score++;
+                        lblScore.Text = $"Очки: {score}";
+
+                        sender.X = rnd.Next(30, pbMain.Width - 30);
+                        sender.Y = rnd.Next(30, pbMain.Height - 30);
+                    }
+                };
+
+                objects.Add(greenCircle);
+            }
+                  
         }
 
         private void pbMain_Paint(object sender, PaintEventArgs e)
@@ -43,6 +61,7 @@ namespace EvantHandling
                 {
                     player.Overlap(obj);
                     obj.Overlap(player);
+                    txtLog.Text = $"[{DateTime.Now:HH:mm:ss:ff}] Игрок пересекся с {obj}\n" + txtLog.Text;
                 }
             }
 
