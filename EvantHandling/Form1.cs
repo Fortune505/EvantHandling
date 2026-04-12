@@ -10,6 +10,9 @@ namespace EvantHandling
         Marker marker;
         Random rnd = new Random();
         int score = 0;
+        float velocityX = 0f;
+        float velocityY = 0f;
+
         public Form1()
         {
             InitializeComponent();
@@ -40,9 +43,20 @@ namespace EvantHandling
                         score++;
                         lblScore.Text = $"Очки: {score}";
 
+                        var circle = sender as MyRectangle;
+                        circle.ResetSize();
+
                         sender.X = rnd.Next(30, pbMain.Width - 30);
                         sender.Y = rnd.Next(30, pbMain.Height - 30);
                     }
+                };
+
+                greenCircle.OnSizeZero += (circle) =>
+                {
+                    circle.ResetSize();
+
+                    circle.X = rnd.Next(30, pbMain.Width - 30);
+                    circle.Y = rnd.Next(30, pbMain.Height - 30);
                 };
 
                 objects.Add(greenCircle);
@@ -86,12 +100,38 @@ namespace EvantHandling
                     dx /= length;
                     dy /= length;
 
-                    player.X += dx * 2;
-                    player.Y += dy * 2;
+                    float speed = 5f;
+
+                    velocityX = dx * speed;
+                    velocityY = dy * speed;
+
+                    player.X += velocityX;
+                    player.Y += velocityY;
 
                     player.Angle = MathF.Atan2(dy, dx) * 180 / MathF.PI;
                 }
-            }                  
+            }
+            else
+            {
+                if (MathF.Abs(velocityX) > 0.1f || MathF.Abs(velocityY) > 0.1f)
+                {
+                    player.X += velocityX;
+                    player.Y += velocityY;
+
+                    velocityX *= 0.95f;
+                    velocityY *= 0.95f;
+                }
+                else
+                {
+                    velocityX = 0;
+                    velocityY = 0;
+                }
+            }
+
+            foreach (var circle in objects.OfType<MyRectangle>())
+            {
+                circle.DecreaseSize();
+            }
 
             pbMain.Invalidate();
         }
